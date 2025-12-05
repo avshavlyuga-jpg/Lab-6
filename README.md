@@ -1,1 +1,1 @@
-# Lab-6
+https://avshavlyuga-jpg.github.io/Lab-6/
