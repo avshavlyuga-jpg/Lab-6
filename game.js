@@ -1,3 +1,4 @@
+
 // Инициализация игры
 document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('game-canvas');
@@ -34,19 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Фокус на игровом экране для управления клавиатурой
     gameScreen.focus();
 
-    // Полноэкранный режим
-    fullscreenBtn.addEventListener('click', toggleFullscreen);
-
-    function toggleFullscreen() {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.log(`Ошибка при включении полноэкранного режима: ${err.message}`);
-            });
-        } else {
-            document.exitFullscreen();
-        }
-    }
-
     // Константы игры
     const GRAVITY = 0.3;
     const PLAYER_NORMAL_SPEED = 2.5;
@@ -66,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let gameState = {
         currentLevel: 1,
         lives: 3,
-        timeLeft: 60 * 60, // 60 минут в секундах
+        timeLeft: 120,
         isPaused: false,
         isGameOver: false,
         levelComplete: false,
@@ -110,10 +98,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Пауза по клавише P
-        if (e.code === 'KeyP') {
-            togglePause();
-        }
 
         // Перезапуск уровня по клавише R
         if (e.code === 'KeyR') {
@@ -124,10 +108,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Полноэкранный режим по клавише F
-        if (e.code === 'KeyF') {
-            toggleFullscreen();
-        }
 
         // Предотвращение стандартных действий браузера
         if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
@@ -404,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Класс меча (взят из второго файла)
+    // Класс меча
     class Sword {
         constructor(x, y) {
             this.x = x;
@@ -448,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Класс врага (взят из второго файла)
+    // Класс врага (исправленная версия с коллизией)
     class Enemy {
         constructor(x, y) {
             this.x = x;
@@ -463,6 +443,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.direction = 1;
             this.isAlive = true;
             this.attackCooldown = 0;
+            this.onGround = false; // Добавляем флаг нахождения на земле
         }
 
         update() {
@@ -481,25 +462,89 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Небольшая гравитация для врага
-                this.velocityY += GRAVITY * 0.5;
+                if (!this.onGround) {
+                    this.velocityY += GRAVITY * 0.5;
+                }
             }
 
             // Обновление позиции
             this.x += this.velocityX;
             this.y += this.velocityY;
 
-            // Ограничение выхода за границы экрана
-            if (this.x < 0) this.x = 0;
-            if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
-            if (this.y + this.height > canvas.height) {
-                this.y = canvas.height - this.height;
-                this.velocityY = 0;
+            // Ограничение выхода за границы экрана (горизонтальные)
+            if (this.x < 0) {
+                this.x = 0;
+                this.velocityX = 0;
+            }
+            if (this.x + this.width > canvas.width) {
+                this.x = canvas.width - this.width;
+                this.velocityX = 0;
+            }
+
+            // Проверка столкновений с платформами
+            this.onGround = false;
+            for (const platform of gameState.platforms) {
+                if (this.collidesWith(platform) && !platform.isLadder) {
+                    // Столкновение сверху (падение на платформу)
+                    if (this.velocityY > 0 && this.y + this.height <= platform.y + this.velocityY) {
+                        this.y = platform.y - this.height;
+                        this.onGround = true;
+                        this.velocityY = 0;
+                    }
+                    // Столкновение снизу (подпрыгивание в потолок)
+                    else if (this.velocityY < 0 && this.y >= platform.y + platform.height + this.velocityY) {
+                        this.y = platform.y + platform.height;
+                        this.velocityY = 0;
+                    }
+                    // Столкновение сбоку
+                    else if (this.velocityX !== 0) {
+                        if (this.velocityX > 0 && this.x + this.width <= platform.x + this.velocityX) {
+                            this.x = platform.x - this.width;
+                            this.velocityX = 0;
+                            this.direction *= -1; // Меняем направление при столкновении сбоку
+                        } else if (this.velocityX < 0 && this.x >= platform.x + platform.width + this.velocityX) {
+                            this.x = platform.x + platform.width;
+                            this.velocityX = 0;
+                            this.direction *= -1; // Меняем направление при столкновении сбоку
+                        }
+                    }
+                }
+            }
+
+            // Падение с края платформы (чтобы враг не ходил в пустоту)
+            if (this.onGround) {
+                let willFall = true;
+                const checkX = this.x + this.width/2 + (this.direction * 10); // Проверяем немного впереди по направлению движения
+
+                for (const platform of gameState.platforms) {
+                    if (!platform.isLadder &&
+                        platform.y <= this.y + this.height &&
+                        platform.y + platform.height >= this.y + this.height &&
+                        checkX >= platform.x &&
+                        checkX <= platform.x + platform.width) {
+                        willFall = false;
+                        break;
+                    }
+                }
+
+                if (willFall) {
+                    this.direction *= -1; // Разворачиваемся, если впереди обрыв
+                    this.velocityX = this.speed * this.direction;
+                }
             }
 
             // Охлаждение атаки
             if (this.attackCooldown > 0) {
                 this.attackCooldown--;
             }
+        }
+
+        // Метод проверки столкновений (добавляем в класс Enemy)
+        collidesWith(object) {
+            return this.x < object.x + object.width &&
+                this.x + this.width > object.x &&
+                this.y < object.y + object.height &&
+                this.y + this.height > object.y;
         }
 
         takeDamage(amount) {
@@ -817,7 +862,7 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.platforms.push(new Platform(0, 0, canvasWidth, TILE_SIZE));
 
             // Выход
-            gameState.exits.push(new Exit(canvasWidth - TILE_SIZE*3, floorHeight - TILE_SIZE*8, TILE_SIZE*2, TILE_SIZE*3));
+            gameState.exits.push(new Exit(canvasWidth - TILE_SIZE*4, floorHeight - TILE_SIZE*3, TILE_SIZE*2, TILE_SIZE*3));
 
             // Враг (в центре)
             const enemy = new Enemy(canvasWidth/2 - 30, floorHeight - 100);
@@ -911,8 +956,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (gameState.currentLevel === 2) {
                         if (gameState.playerHasSword) {
                             showMessage("У вас есть меч! Нажмите CTRL для атаки врага", 2500);
-                        } else {
-                            showMessage("Без меча будет сложно! Избегайте врага!", 2500);
                         }
                     }
                 }, 2000);
@@ -952,7 +995,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function restartGame() {
         gameState.currentLevel = 1;
         gameState.lives = 3;
-        gameState.timeLeft = 60 * 60;
+        gameState.timeLeft = 120;
         gameState.isPaused = false;
         gameState.isGameOver = false;
         gameState.levelComplete = false;
@@ -998,20 +1041,6 @@ document.addEventListener('DOMContentLoaded', function() {
         initLevel(gameState.currentLevel);
     }
 
-    // Пауза игры
-    function togglePause() {
-        if (!gameState.gameStarted || gameState.levelComplete || gameState.isGameOver) return;
-
-        gameState.isPaused = !gameState.isPaused;
-
-        if (gameState.isPaused) {
-            pauseOverlay.style.display = 'flex';
-        } else {
-            pauseOverlay.style.display = 'none';
-            gameScreen.focus();
-        }
-    }
-
     // Показ сообщения
     function showMessage(text, duration) {
         messageOverlay.innerHTML = `<div class="message">${text}</div>`;
@@ -1052,7 +1081,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (gameState.gameStarted && !gameState.isPaused && !gameState.levelComplete && !gameState.isGameOver) {
             gameState.player.update();
 
-            // Обновление врагов (только на уровне 2)
+            // Обновление врагов
             if (gameState.currentLevel === 2) {
                 gameState.enemies.forEach(enemy => enemy.update());
             }
@@ -1102,7 +1131,4 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         gameScreen.focus();
     }, 100);
-
 });
-
-
