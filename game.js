@@ -757,18 +757,20 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.platforms.push(new Platform(0, 0, canvasWidth, TILE_SIZE));
 
             // Платформа в начале - стартовая площадка
-            gameState.platforms.push(new Platform(59, floorHeight - TILE_SIZE * 3, 250, 250));
+            gameState.platforms.push(new Platform(44, floorHeight - TILE_SIZE * 3, 250, 250));
 
-            gameState.spikes.push(new Spike(320, floorHeight-45, TILE_SIZE, TILE_SIZE));
-            gameState.spikes.push(new Spike(350, floorHeight-45, TILE_SIZE, TILE_SIZE));
-            gameState.spikes.push(new Spike(380, floorHeight-45, TILE_SIZE, TILE_SIZE));
-            gameState.spikes.push(new Spike(410, floorHeight-45, TILE_SIZE, TILE_SIZE));
-            gameState.spikes.push(new Spike(440, floorHeight-45, TILE_SIZE, TILE_SIZE));
-            gameState.spikes.push(new Spike(470, floorHeight-45, TILE_SIZE, TILE_SIZE));
-            gameState.spikes.push(new Spike(500, floorHeight-45, TILE_SIZE, TILE_SIZE));
-            for (let i = 0; i < 38; i++) {
-                gameState.spikes.push(new Spike(690+30*i, floorHeight-45, TILE_SIZE, TILE_SIZE));
+            gameState.spikes.push(new Spike(300, floorHeight-38, TILE_SIZE, TILE_SIZE));
+            for (let i = 0; i < 4; i++) {
+                gameState.spikes.push(new Spike(300+30*i, floorHeight-38, TILE_SIZE, TILE_SIZE));
             }
+
+
+            for (let i = 0; i < 32; i++) {
+                gameState.spikes.push(new Spike(520+30*i, floorHeight-38, TILE_SIZE, TILE_SIZE));
+            }
+
+            // Меч (добавляем на уровне 1)
+            gameState.swords.push(new Sword(490, floorHeight - 330));
 
             // Первая платформа
             gameState.platforms.push(new Platform(450, floorHeight - 300, TILE_SIZE * 3, TILE_SIZE));
@@ -787,9 +789,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Шип
             gameState.spikes.push(new Spike(TILE_SIZE * 28, floorHeight - TILE_SIZE * 8, TILE_SIZE, TILE_SIZE));
-
-            // Меч (добавляем на уровне 1)
-            gameState.swords.push(new Sword(TILE_SIZE * 20, floorHeight - TILE_SIZE * 8));
 
             // Платформа с выходом
             gameState.platforms.push(new Platform(TILE_SIZE * 33, floorHeight - TILE_SIZE * 3, TILE_SIZE * 8, TILE_SIZE));
@@ -1105,4 +1104,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 100);
 
 });
+
 
