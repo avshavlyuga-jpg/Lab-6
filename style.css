@@ -1,0 +1,256 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background-color: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+#game-screen {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background-color: #000;
+    outline: none;
+}
+
+#game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Игровой интерфейс */
+#game-ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: 2px solid #d4af37;
+    display: flex;
+    gap: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+}
+
+#level-indicator, #time-indicator, #lives-indicator, #speed-indicator {
+    color: #d4af37;
+}
+
+#level-display, #time-display, #lives-display, #speed-display {
+    color: #fff;
+    font-weight: normal;
+}
+
+#speed-display {
+    transition: color 0.3s;
+}
+
+#speed-display.speed-boost {
+    color: #27ae60;
+    animation: pulse 0.5s infinite alternate;
+}
+
+@keyframes pulse {
+    from { opacity: 0.7; }
+    to { opacity: 1; }
+}
+
+/* Оверлеи */
+#message-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 15;
+}
+
+#message-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    z-index: -1;
+}
+
+#level-complete-overlay,
+#game-over-overlay,
+#start-overlay,
+#pause-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 20;
+    display: none;
+    text-align: center;
+}
+
+#start-overlay {
+    display: flex;
+}
+
+h1 {
+    font-size: 4rem;
+    color: #d4af37;
+    margin-bottom: 30px;
+    text-shadow: 3px 3px 5px #000;
+    letter-spacing: 2px;
+    font-family: 'Times New Roman', serif;
+}
+
+#level-complete-overlay h2,
+#game-over-overlay h2,
+#pause-overlay h2 {
+    font-size: 3.5rem;
+    color: #d4af37;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px #000;
+    letter-spacing: 1px;
+}
+
+#game-over-overlay h2 {
+    color: #e74c3c;
+}
+
+#level-complete-overlay p,
+#game-over-overlay p,
+#start-overlay p,
+#pause-overlay p {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: #f7f1e3;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.controls-info {
+    margin-top: 30px;
+    font-size: 1.2rem;
+    color: #aaa;
+}
+
+.controls-info p {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+/* Кнопка полноэкранного режима */
+#fullscreen-btn {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 2px solid #d4af37;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+}
+
+#fullscreen-btn:hover {
+    opacity: 1;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    #level-complete-overlay h2,
+    #game-over-overlay h2,
+    #pause-overlay h2 {
+        font-size: 2.5rem;
+    }
+
+    #level-complete-overlay p,
+    #game-over-overlay p,
+    #start-overlay p,
+    #pause-overlay p {
+        font-size: 1.3rem;
+    }
+
+    #game-ui {
+        font-size: 14px;
+        padding: 5px 10px;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .controls-info {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    #level-complete-overlay h2,
+    #game-over-overlay h2,
+    #pause-overlay h2 {
+        font-size: 2rem;
+    }
+
+    #level-complete-overlay p,
+    #game-over-overlay p,
+    #start-overlay p,
+    #pause-overlay p {
+        font-size: 1rem;
+    }
+
+    .controls-info {
+        font-size: 0.8rem;
+    }
+
+    #game-ui {
+        flex-direction: column;
+        gap: 5px;
+        font-size: 12px;
+    }
+    /* Индикатор здоровья */
+    #health-indicator {
+        color: #d4af37;
+    }
+
+    #health-display {
+        color: #27ae60;
+        font-weight: normal;
+    }
+}

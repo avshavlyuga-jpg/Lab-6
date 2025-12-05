@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prince of Persia (1989) - Fullscreen</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game-screen" tabindex="0">
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Интерфейс игры -->
+    <div id="game-ui">
+        <div id="level-indicator">Уровень: <span id="level-display">1</span></div>
+        <div id="time-indicator">Время: <span id="time-display">60:00</span></div>
+        <div id="lives-indicator">Жизни: <span id="lives-display">3</span></div>
+        <div id="speed-indicator">Скорость: <span id="speed-display">НОРМАЛЬНАЯ</span></div>
+    </div>
+
+    <!-- Оверлеи -->
+    <div id="message-overlay"></div>
+
+    <div id="level-complete-overlay">
+        <h2>УРОВЕНЬ ПРОЙДЕН!</h2>
+        <p>Приготовьтесь к следующему уровню...</p>
+    </div>
+
+    <div id="game-over-overlay">
+        <h2>ПРИНЦ ПОГИБ</h2>
+        <p>Нажмите R для перезапуска</p>
+    </div>
+
+    <div id="start-overlay">
+        <h1>PRINCE OF PERSIA</h1>
+        <p>Нажмите любую клавишу для начала</p>
+        <div class="controls-info">
+            <p>Управление: ← → ↑ ПРОБЕЛ</p>
+            <p>SHIFT - ускорение и длинный прыжок</p>
+            <p>Пауза: P | Перезапуск: R | Полный экран: F</p>
+        </div>
+    </div>
+
+    <div id="pause-overlay">
+        <h2>ПАУЗА</h2>
+        <p>Нажмите P для продолжения</p>
+    </div>
+
+    <!-- Кнопка полноэкранного режима -->
+    <button id="fullscreen-btn" title="Полный экран">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="white" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+        </svg>
+    </button>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
