@@ -792,7 +792,7 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.swords.push(new Sword(TILE_SIZE * 20, floorHeight - TILE_SIZE * 8));
 
             // Платформа с выходом
-            gameState.platforms.push(new Platform(TILE_SIZE * 33, floorHeight - TILE_SIZE * 2.98, TILE_SIZE * 8, TILE_SIZE));
+            gameState.platforms.push(new Platform(TILE_SIZE * 33, floorHeight - TILE_SIZE * 3, TILE_SIZE * 8, TILE_SIZE));
 
             // Выход - дверь
             gameState.exits.push(new Exit(TILE_SIZE * 39, floorHeight - TILE_SIZE * 6, TILE_SIZE * 2, TILE_SIZE * 3));
@@ -1103,4 +1103,5 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         gameScreen.focus();
     }, 100);
+
 });
